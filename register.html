@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Sandhai</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+
+</head>
+<body>
+    <section id="register">
+        <div class="container">
+            <!-- Left Side: Brand Logo -->
+            <div class="brand-section">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Brand Logo">
+            </div>
+            <div class="form-section">
+                <div class="form-container">
+            <h2>Register</h2>
+            <!-- Add this where you want flash messages to appear -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                     {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                     {% endfor %}
+                   {% endif %}
+                {% endwith %}
+            <form action="{{ url_for('register') }}" method="POST">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="text" name="mobile" placeholder="Mobile Number" required>
+                <input type="text" name="full_name" placeholder="Full Name" required>
+                <input type="text" name="city" placeholder="City" required>
+                <input type="text" name="state" placeholder="State" required>
+                <input type="text" name="pincode" placeholder="Pincode" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Register</button>
+            </form>
+            
+            <p>Already have an account? <a href="/login">Login</a></p>
+        </div>
+    </section>
+</body>
+</html>

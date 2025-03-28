@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Summary</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Your Orders</h2>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} mb-6 p-4 rounded-lg text-center">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Order Details -->
+        {% if orders %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for order in orders %}
+                    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                        <!-- Product Image Carousel -->
+                        <div class="carousel">
+                            {% if order.Product.images %}
+                                {% for image in order.Product.images %}
+                                    <img src="{{ url_for('static', filename='uploads/' + image) }}" 
+                                         alt="{{ order.Product.name }}" 
+                                         class="{% if loop.first %}active{% endif %}">
+                                {% endfor %}
+                            {% else %}
+                                <img src="{{ url_for('static', filename='placeholder.jpg') }}" 
+                                     alt="No Image" 
+                                     class="active">
+                            {% endif %}
+                            <button class="carousel-button prev" onclick="prevImage(this)">&#10094;</button>
+                            <button class="carousel-button next" onclick="nextImage(this)">&#10095;</button>
+                        </div>
+
+                        <!-- Product Name -->
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ order.Product.name }}</h3>
+
+                        <!-- Product Description -->
+                        <p class="text-gray-600 text-sm mb-4">{{ order.Product.description }}</p>
+
+                        <!-- Order Details -->
+                        <div class="space-y-2">
+                            <p class="text-gray-700">
+                                <span class="font-semibold">Price:</span> ₹{{ order.Product.price }}
+                            </p>
+                            <p class="text-gray-700">
+                                <span class="font-semibold">Quantity:</span> {{ order.Order.quantity }}
+                            </p>
+                            <p class="text-gray-700">
+                                <span class="font-semibold">Total Price:</span> ₹{{ order.Order.total_price }}
+                            </p>
+                            <p class="text-sm font-semibold">
+                                <span class="text-blue-600">Status:</span> 
+                                <span class="capitalize">{{ order.Order.status }}</span>
+                            </p>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="mt-6 space-y-2">
+                            <!-- View Details Button -->
+                            <a href="{{ url_for('order_details', order_id=order.Order.id) }}" 
+                               class="w-full block text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+                                View Details
+                            </a>
+
+                            <!-- Cancel Order Button (for pending orders) -->
+                            {% if order.Order.status == 'Pending' %}
+                                <form action="{{ url_for('cancel_order', order_id=order.Order.id) }}" method="POST" class="w-full">
+                                    <button type="submit" 
+                                            class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200">
+                                        Cancel Order
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                            <!-- Delete Button (for cancelled orders) -->
+                            {% if order.Order.status == 'cancelled' %}
+                                <form action="{{ url_for('delete_order', order_id=order.Order.id) }}" method="POST" class="w-full">
+                                    <button type="submit" 
+                                            class="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition duration-200">
+                                        Delete Order
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- No Orders Message -->
+            <div class="text-center py-10">
+                <p class="text-gray-700 text-lg">You have no orders yet.</p>
+                <a href="{{ url_for('home') }}" 
+                   class="mt-4 inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+                    Start Shopping
+                </a>
+            </div>
+        {% endif %}
+
+        <!-- Back to Home Button -->
+        <div class="text-center mt-10">
+            <a href="{{ url_for('home') }}" 
+               class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition duration-200">
+                ⬅ Back to Home
+            </a>
+        </div>
+    </div>
+
+    <!-- JavaScript for Carousel -->
+    <script>
+        function prevImage(button) {
+            const carousel = button.parentElement;
+            const images = carousel.querySelectorAll('img');
+            let activeIndex = 0;
+            images.forEach((img, index) => {
+                if (img.classList.contains('active')) {
+                    img.classList.remove('active');
+                    activeIndex = index;
+                }
+            });
+            if (activeIndex === 0) {
+                images[images.length - 1].classList.add('active');
+            } else {
+                images[activeIndex - 1].classList.add('active');
+            }
+        }
+
+        function nextImage(button) {
+            const carousel = button.parentElement;
+            const images = carousel.querySelectorAll('img');
+            let activeIndex = 0;
+            images.forEach((img, index) => {
+                if (img.classList.contains('active')) {
+                    img.classList.remove('active');
+                    activeIndex = index;
+                }
+            });
+            if (activeIndex === images.length - 1) {
+                images[0].classList.add('active');
+            } else {
+                images[activeIndex + 1].classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

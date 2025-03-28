@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <style>
+        .carousel {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-bottom: 1.5rem; /* Add some spacing below the carousel */
+        }
+        .carousel img {
+            width: 100%;
+            height: auto; /* Allow the height to adjust based on the image's aspect ratio */
+            display: none;
+            border-radius: 8px;
+        }
+        .carousel img.active {
+            display: block;
+        }
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 50%;
+            z-index: 10; /* Ensure buttons are above the images */
+        }
+        .carousel-button.prev {
+            left: 10px;
+        }
+        .carousel-button.next {
+            right: 10px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Order Details</h2>
+
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <!-- Product Image Carousel -->
+            <div class="carousel">
+                {% if order.Product.images %}
+                    {% for image in order.Product.images %}
+                        <img src="{{ url_for('static', filename='uploads/' + image) }}" 
+                             alt="{{ order.Product.name }}" 
+                             class="{% if loop.first %}active{% endif %}">
+                    {% endfor %}
+                {% else %}
+                    <img src="{{ url_for('static', filename='placeholder.jpg') }}" 
+                         alt="No Image" 
+                         class="active">
+                {% endif %}
+                <button class="carousel-button prev" onclick="prevImage(this)">&#10094;</button>
+                <button class="carousel-button next" onclick="nextImage(this)">&#10095;</button>
+            </div>
+
+            <!-- Product Name -->
+            <h3 class="text-2xl font-semibold text-gray-800 mt-6 mb-4">{{ order.Product.name }}</h3>
+
+            <!-- Product Description -->
+            <p class="text-gray-600 text-lg mb-6">{{ order.Product.description }}</p>
+
+            <!-- Order Details -->
+            <div class="space-y-4">
+                <p class="text-gray-700">
+                    <span class="font-semibold">Price:</span> ₹{{ order.Product.price }}
+                </p>
+                <p class="text-gray-700">
+                    <span class="font-semibold">Quantity:</span> {{ order.Order.quantity }}
+                </p>
+                <p class="text-gray-700">
+                    <span class="font-semibold">Total Price:</span> ₹{{ order.Order.total_price }}
+                </p>
+                <p class="text-gray-700">
+                    <span class="font-semibold">Status:</span> 
+                    <span class="capitalize">{{ order.Order.status }}</span>
+                </p>
+            </div>
+
+            <!-- Back to Orders Button -->
+            <div class="mt-8">
+                <a href="{{ url_for('order_summary') }}" 
+                   class="w-full block text-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+                    ⬅ Back to Orders
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Carousel -->
+    <script>
+        function prevImage(button) {
+            const carousel = button.parentElement;
+            const images = carousel.querySelectorAll('img');
+            let activeIndex = 0;
+            images.forEach((img, index) => {
+                if (img.classList.contains('active')) {
+                    img.classList.remove('active');
+                    activeIndex = index;
+                }
+            });
+            if (activeIndex === 0) {
+                images[images.length - 1].classList.add('active');
+            } else {
+                images[activeIndex - 1].classList.add('active');
+            }
+        }
+
+        function nextImage(button) {
+            const carousel = button.parentElement;
+            const images = carousel.querySelectorAll('img');
+            let activeIndex = 0;
+            images.forEach((img, index) => {
+                if (img.classList.contains('active')) {
+                    img.classList.remove('active');
+                    activeIndex = index;
+                }
+            });
+            if (activeIndex === images.length - 1) {
+                images[0].classList.add('active');
+            } else {
+                images[activeIndex + 1].classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Account</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="flex items-center space-x-4">
+            <a href="{{ url_for('home') }}" class="brand text-yellow-400 text-3xl">Sandhai</a>
+        </div>
+        <div class="user-section">
+            {% if username %}
+                <span>Welcome, {{ username }}!</span>
+                <div class="relative">
+                    <button onclick="toggleDropdown()" class="bg-[#131921] text-white px-4 py-2 rounded-md focus:outline-none">
+                        Account ▼
+                    </button>
+                    <div id="dropdownMenu" class="dropdown-menu">
+                        <a href="/logout">Logout</a>
+                        <a href="/feedback">Feedback</a>
+                        <a href="/rate-us">Rate Us</a>
+                    </div>
+                </div>
+            {% else %}
+                <a class="btn btn-logout" href="/logout">Logout</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- User Account Container -->
+    <div class="account-container">
+        <h2>User Account</h2>
+        <div class="account-details">
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Mobile:</strong> {{ user.mobile }}</p>
+            <p><strong>Full Name:</strong> {{ user.full_name }}</p>
+            <p><strong>City:</strong> {{ user.city }}</p>
+            <p><strong>State:</strong> {{ user.state }}</p>
+            <p><strong>Pincode:</strong> {{ user.pincode }}</p>
+        </div>
+        <div class="actions">
+            <a href="{{ url_for('update_account') }}" class="btn btn-update">Update Account</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-logout">Logout</a>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('dropdownMenu');
+            if (!event.target.closest('.relative')) {
+                dropdown.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

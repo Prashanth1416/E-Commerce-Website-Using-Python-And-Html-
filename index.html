@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sandhai - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: -250px; /* Hide sidebar by default */
+            background-color: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.active {
+            left: 0; /* Show sidebar when active */
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar ul li a {
+            display: block;
+            padding: 10px 20px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <button onclick="toggleSidebar()" class="text-right text-lg font-bold p-4">&times;</button>
+        <ul class="mt-4">
+            <li><a href="/order" class="block text-gray-700 hover:text-orange-500">Orders</a></li>
+            <li><a href="/cart" class="block text-gray-700 hover:text-orange-500">Cart</a></li>
+            <li><a href="/account" class="block text-gray-700 hover:text-orange-500">User Account</a></li>
+            <li id="auth-link">
+                {% if username %}
+                    <a href="/logout" class="block text-red-500 hover:text-red-700">Logout</a>
+                {% else %}
+                    <a href="/login" class="block text-blue-500 hover:text-blue-700">Login</a>
+                {% endif %}
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Header -->
+    <header class="bg-[#131921] text-white py-3 px-6 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <!-- Sidebar Toggle Button -->
+            <button onclick="toggleSidebar()" class="text-2xl text-white">&#9776;</button>
+            <span class="brand text-yellow-400 text-3xl">Sandhai</span>
+        </div>
+        
+        <!-- Search Bar -->
+        <div class="flex-grow flex justify-center">
+            <form id="searchForm" action="{{ url_for('search') }}" method="GET" class="w-full max-w-xl flex items-center">
+                <input type="text" name="query" id="searchInput" class="search-bar w-full px-4 py-2 rounded-l-lg text-black" placeholder="Search for products..." value="{{ query }}">
+                <button type="submit" class="bg-yellow-400 text-black px-6 py-2 rounded-r-lg hover:bg-yellow-500 transition-colors">
+                    Search
+                </button>
+            </form>
+        </div>
+        
+        <!-- User Section -->
+        <div class="flex items-center space-x-6 text-lg">
+            <a href="/order" class="text-white hover:underline">Orders</a>
+            <a href="/cart" class="text-white hover:underline">Cart</a>
+            <div id="user-section" class="flex items-center space-x-2">
+                {% if username %}
+                    <span id="welcome-message">Welcome  <span id="user-name">{{ username }}</span>!</span>
+                    <div class="relative">
+                        <button onclick="toggleDropdown()" class="bg-[#131921] text-white px-4 py-2 rounded-md focus:outline-none">
+                            Account ▼
+                        </button>
+                        <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg hidden">
+                            <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Logout</a>
+                            <a href="/feedback" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Feedback</a>
+                            <a href="/rate-us" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Rate Us</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="/login" id="login-link" class="text-white hover:underline">Login / Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+ <!-- Shopping Categories -->
+ <div class="categories bg-[#232F3E] text-white py-2 px-6 flex space-x-6 overflow-x-auto">
+    <a href="/electronics" class="hover:text-yellow-400">Electronics</a>
+    <a href="/fashion" class="hover:text-yellow-400">Fashion</a>
+    <a href="/home-kitchen" class="hover:text-yellow-400">Home & Kitchen</a>
+    <a href="/books" class="hover:text-yellow-400">Books</a>
+    <a href="/toys-games" class="hover:text-yellow-400">Toys & Games</a>
+    <a href="/beauty" class="hover:text-yellow-400">Beauty</a>
+    <a href="/sports" class="hover:text-yellow-400">Sports</a>
+    <a href="/groceries" class="hover:text-yellow-400">Groceries</a>
+</div>
+
+    <!-- Main Content -->
+    <main class="main-content p-6">
+        <div class="product-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {% for product in products %}
+                <div class="product-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <!-- Carousel for Product Images -->
+                    <div class="carousel relative">
+                        {% for image in product.images %}
+                            <img src="{{ url_for('static', filename='uploads/' + image) }}" alt="{{ product.name }}" class="w-full h-48 object-cover {% if loop.first %}active{% endif %}">
+                        {% endfor %}
+                        <button class="carousel-button prev absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-75 p-2 rounded-full shadow-md" onclick="prevImage(this)">&#10094;</button>
+                        <button class="carousel-button next absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-75 p-2 rounded-full shadow-md" onclick="nextImage(this)">&#10095;</button>
+                    </div>
+                    <div class="p-4">
+                        <h2 class="text-xl font-semibold">{{ product.name }}</h2>
+                        <p class="text-gray-600">{{ product.description }}</p>
+                        <p class="text-lg font-bold mt-2">₹{{ product.price }}</p>
+                        {% if session['user_id'] %}
+                            <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" class="mt-4">
+                                <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">Add to Cart</button>
+                            </form>
+                        {% else %}
+                            <a href="{{ url_for('login') }}" class="block w-full bg-blue-500 text-white py-2 px-4 rounded-md text-center hover:bg-blue-600 transition-colors mt-4">Add to Cart</a>
+                        {% endif %}
+                        <form action="{{ url_for('purchase_now', product_id=product.id) }}" method="POST" class="mt-2">
+                            <button type="submit" class="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors">Buy Now</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Toggle Sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Toggle Dropdown
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Handle Enter Key in Search Input
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent form submission
+                document.getElementById('searchForm').submit(); // Submit the form
+            }
+        });
+
+        // Carousel Functionality
+        function prevImage(button) {
+            const carousel = button.parentElement;
+            const images = carousel.querySelectorAll('img');
+            let activeIndex = 0;
+            images.forEach((img, index) => {
+                if (img.classList.contains('active')) {
+                    img.classList.remove('active');
+                    activeIndex = index;
+                }
+            });
+            if (activeIndex === 0) {
+                images[images.length - 1].classList.add('active');
+            } else {
+                images[activeIndex - 1].classList.add('active');
+            }
+        }
+
+        function nextImage(button) {
+            const carousel = button.parentElement;
+            const images = carousel.querySelectorAll('img');
+            let activeIndex = 0;
+            images.forEach((img, index) => {
+                if (img.classList.contains('active')) {
+                    img.classList.remove('active');
+                    activeIndex = index;
+                }
+            });
+            if (activeIndex === images.length - 1) {
+                images[0].classList.add('active');
+            } else {
+                images[activeIndex + 1].classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Us - Sandhai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        }
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .star {
+            font-size: 2rem;
+            cursor: pointer;
+            color: #cbd5e1;
+        }
+        .star:hover, .star.selected {
+            color: #facc15;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-4">Rate Your Experience</h2>
+        <p class="text-gray-600 text-center mb-6">How was your experience with Sandhai?</p>
+
+        <form action="/rate-us" method="POST" class="space-y-4 text-center">
+            <div class="star-rating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span> 
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+            
+            <input type="hidden" name="rating" id="rating-input" required>
+            
+            <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition">
+                Submit Rating
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <a href="/" class="text-blue-500 hover:underline">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        const stars = document.querySelectorAll('.star');
+        const ratingInput = document.getElementById('rating-input');
+
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                ratingInput.value = value;
+                
+                stars.forEach(s => s.classList.remove('selected'));
+                for (let i = 0; i < value; i++) {
+                    stars[i].classList.add('selected');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product - Sandhai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+        </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-[#131921] text-white py-3 px-6 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <span class="brand text-yellow-400 text-3xl">Sandhai</span>
+            <h1>Edit Product</h1>
+        </div>
+        <a href="{{ url_for('admin_dashboard') }}" class="bg-blue-500 px-4 py-2 rounded text-white hover:bg-blue-700">Back to Dashboard</a>
+    </header>
+
+    <!-- Edit Product Form -->
+    <main class="p-6">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold mb-4">Edit Product</h2>
+            <form action="{{ url_for('edit_product', product_id=product.id) }}" method="POST">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" name="name" placeholder="Product Name" class="p-2 border rounded w-full" value="{{ product.name }}" required>
+                    <input type="text" name="description" placeholder="Product Description" class="p-2 border rounded w-full" value="{{ product.description }}" required>
+                    <input type="number" name="price" placeholder="Price" class="p-2 border rounded w-full" value="{{ product.price }}" required>
+                    <select name="category" class="p-2 border rounded w-full" required>
+                        <option value="" disabled>Select Category</option>
+                        <option value="Electronics" {% if product.category == 'Electronics' %}selected{% endif %}>Electronics</option>
+                        <option value="Fashion" {% if product.category == 'Fashion' %}selected{% endif %}>Fashion</option>
+                        <option value="Home & Kitchen" {% if product.category == 'Home & Kitchen' %}selected{% endif %}>Home & Kitchen</option>
+                        <option value="Books" {% if product.category == 'Books' %}selected{% endif %}>Books</option>
+                        <option value="Toys & Games" {% if product.category == 'Toys & Games' %}selected{% endif %}>Toys & Games</option>
+                        <option value="Beauty" {% if product.category == 'Beauty' %}selected{% endif %}>Beauty</option>
+                        <option value="Sports" {% if product.category == 'Sports' %}selected{% endif %}>Sports</option>
+                        <option value="Groceries" {% if product.category == 'Groceries' %}selected{% endif %}>Groceries</option>
+                    </select>
+                </div>
+                <button type="submit" class="bg-green-500 text-white px-6 py-2 mt-4 rounded hover:bg-green-700">Update Product</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
